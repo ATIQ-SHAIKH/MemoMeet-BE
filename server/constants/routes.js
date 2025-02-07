@@ -7,7 +7,6 @@ module.exports = {
             SIGNUP_SET_PASSWORD: "/signup/set/password",
             LOGIN: "/login",
             SIGN_IN: "/signin",
-            CREATE_MEET_CODE: "/create-meet-code"
         },
         PRIVATE: {
             ROOT: "/private",

@@ -18,7 +18,7 @@ const jwtAuth = async (req, res, next) => {
     }
     try {
         const decoded = jwt.verify(token, process.env.TOKEN_KEY);
-        if (!decoded || !decoded?._id) return res
+        if (!decoded || !decoded?._id || !decoded?.email) return res
             .status(RESPONSES.FORBIDDEN)
             .json({ msg: GENERAL_MESSAGES.UNAUTHORIZED });
         req.user = decoded;

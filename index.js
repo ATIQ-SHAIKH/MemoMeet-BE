@@ -62,7 +62,7 @@ app.use(
 );
 
 app.get("/example", (req, res) => {
-  console.log(req.ip); // Logs client's IP address
+  console.log(`Client IP: ${req.ip}`); // Logs client's IP address
   res.send(`Client IP: ${req.ip}`);
 });
 
@@ -96,35 +96,36 @@ io.on("connection", (socket) => {
   // Triggered when a peer hits the join room button.
   socket.on("join", ({ roomId: roomName }) => {
     const { rooms } = io.sockets.adapter;
-    const room = rooms.get(roomName);
-    console.log(roomName, room, rooms, 'r');
     socket.join(roomName);
-    const roomm = rooms.get(roomName);
-    console.log(roomName, roomm, rooms, 'r');
+    const room = rooms.get(roomName);
+    console.log(`User with ID: ${socket.id} joined room: ${roomName}, Room Size: ${room.size}`);
     socket.to(roomName).emit("joined", { newPeerSocketId: socket.id })
   });
 
   // // Triggered when server gets an icecandidate from a peer in the room.
   socket.on('ice-candidate', (iceCandidate, targetSocketId) => {
     console.log(`Ice candidate received on server to be able to send to ${targetSocketId} `, iceCandidate)
-
     socket.to(targetSocketId).emit('ice-candidate', iceCandidate, socket.id)
   })
 
   // // Triggered when server gets an offer from a peer in the room.
   socket.on("offer", ({ offer, to }) => {
     socket.to(to).emit("offer", { offer, from: socket.id }); // Sends Offer to the other peer in the room.
+    console.log(`Offer received on server to be able to send to ${to} `, offer)
   });
 
   // // Triggered when server gets an answer from a peer in the room.
   socket.on("answer", ({ answer, to }) => {
     socket.to(to).emit('answer', { answer, from: socket.id }); // Sends Answer to the other peer in the room.
+    console.log(`Answer received on server to be able to send to ${to} `, answer)
   });
 
   socket.on('leave', (roomName) => {
-    console.log("leave")
     socket.to(roomName).emit('user-left', socket.id);
     socket.leave(roomName);
+    const { rooms } = io.sockets.adapter;
+    const room = rooms.get(roomName);
+    console.log(`User with ID: ${socket.id} left room: ${roomName}, Room Size: ${room ? room.size : 0}`);
   })
 
 });
